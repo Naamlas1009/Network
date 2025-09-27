@@ -1,0 +1,59 @@
+-------------------------------------------
+SERVER
+-------------------------------------------
+
+yum install dhcp -y
+
+gedit /etc/sysconfig/network-scripts/ifcfg-ens33
+
+TYPE=Ethernet
+DEVICE=ens33
+NAME=ens33
+BOOTPROTO=static
+ONBOOT=yes
+IPADDR=125.150.175.100
+NETMASK=255.248.0.0
+GATEWAY=125.150.175.100
+DNS1=8.8.8.8
+
+gedit /etc/sysconfig/dhcpd
+DHCPDARGS=ens33
+
+gedit /etc/dhcp/dhcpd.conf
+
+option domain-name "cse.uom";
+option domain-name-servers 125.150.175.100, 8.8.8.8;
+
+default-lease-time 600;
+max-lease-time 7200;
+log-facility local7;
+
+subnet 125.144.0.0 netmask 255.248.0.0 {
+    range 125.150.175.101 125.150.175.125;
+    option broadcast-address 125.151.255.255;
+    option routers 125.150.175.100;
+}
+
+systemctl stop firewalld
+setenforce 0
+systemctl restart network
+systemctl restart dhcpd
+systemctl status dhcpd
+
+
+-------------------------------------------
+client
+-------------------------------------------
+gedit /etc/sysconfig/network-scripts/ifcfg-ens33
+DEVICE=ens33
+BOOTPROTO=dhcp
+TYPE=Ethernet
+ONBOOT=yes
+
+systemctl stop firewalld
+setenforce 0
+systemctl restart network
+dhclient -r ens33
+dhclient -v ens33
+ip addr show ens33
+
