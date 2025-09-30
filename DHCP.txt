@@ -2,7 +2,7 @@
 SERVER
 -------------------------------------------
 
-yum install dhcp -y
+yum install -y dhcp
 
 gedit /etc/sysconfig/network-scripts/ifcfg-ens33
 
@@ -50,10 +50,8 @@ BOOTPROTO=dhcp
 TYPE=Ethernet
 ONBOOT=yes
 
-systemctl stop firewalld
-setenforce 0
-systemctl restart network
 dhclient -r ens33
 dhclient -v ens33
 ip addr show ens33
+
 
